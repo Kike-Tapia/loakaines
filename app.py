@@ -1,10 +1,5 @@
-from flask import Flask
-
-from flask import render_template
-from flask import request
-
+from flask import Flask, render_template, request
 import pusher
-
 import mysql.connector
 import datetime
 import pytz
@@ -21,41 +16,44 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     con.close()
-
     return render_template("app.html")
 
-# Ejemplo de ruta GET usando templates para mostrar una vista
-@app.route("/alumnos")
-def alumnos():
-    con.close()
-
-    return render_template("alumnos.html")
-
-# Ejemplo de ruta POST para ver cómo se envia la informacion
-@app.route("/alumnos/guardar", methods=["POST"])
-def alumnosGuardar():
-    con.close()
-    matricula      = request.form["txtMatriculaFA"]
-    nombreapellido = request.form["txtNombreApellidoFA"]
-
-    return f"Matrícula {matricula} Nombre y Apellido {nombreapellido}"
-
-# Código usado en las prácticas
-@app.route("/buscar")
-def buscar():
+# Ruta para ver los cursos
+@app.route("/cursos")
+def cursos():
     if not con.is_connected():
         con.reconnect()
 
     cursor = con.cursor()
-    cursor.execute("SELECT * FROM sensor_log ORDER BY Id_Log DESC")
+    cursor.execute("SELECT * FROM tst0_cursos ORDER BY Id_Curso DESC")
     registros = cursor.fetchall()
 
     con.close()
 
-    return registros
+    return render_template("cursos.html", registros=registros)
 
-@app.route("/registrar", methods=["GET"])
-def registrar():
+# Ruta para agregar un nuevo curso
+@app.route("/cursos/guardar", methods=["POST"])
+def cursosGuardar():
+    if not con.is_connected():
+        con.reconnect()
+    
+    nombre_curso = request.form["txtNombreCurso"]
+    telefono = request.form["txtTelefono"]
+
+    cursor = con.cursor()
+    sql = "INSERT INTO tst0_cursos (Nombre_Curso, Telefono) VALUES (%s, %s)"
+    val = (nombre_curso, telefono)
+    cursor.execute(sql, val)
+
+    con.commit()
+    con.close()
+    
+    return f"Curso '{nombre_curso}' guardado con éxito."
+
+# Otras rutas relacionadas con los cursos
+@app.route("/registrar_curso", methods=["GET"])
+def registrar_curso():
     args = request.args
 
     if not con.is_connected():
@@ -63,8 +61,8 @@ def registrar():
 
     cursor = con.cursor()
 
-    sql = "INSERT INTO sensor_log (Temperatura, Humedad, Fecha_Hora) VALUES (%s, %s, %s)"
-    val = (args["temperatura"], args["humedad"], datetime.datetime.now(pytz.timezone("America/Matamoros")))
+    sql = "INSERT INTO tst0_cursos (Nombre_Curso, Telefono) VALUES (%s, %s)"
+    val = (args["nombre_curso"], args["telefono"])
     cursor.execute(sql, val)
     
     con.commit()
@@ -78,6 +76,6 @@ def registrar():
         ssl=True
     )
 
-    pusher_client.trigger("canalRegistrosTemperaturaHumedad", "registroTemperaturaHumedad", args)
+    pusher_client.trigger("canalRegistrosCursos", "registroCurso", args)
 
     return args
