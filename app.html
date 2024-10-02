@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscripción a Curso</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery y jQuery Validation -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.19.3/jquery.validate.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Validación del formulario
+            $("#formInscripcion").validate({
+                rules: {
+                    curso: {
+                        required: true
+                    },
+                    telefono: {
+                        required: true,
+                        digits: true,
+                        minlength: 10,
+                        maxlength: 10
+                    }
+                },
+                messages: {
+                    curso: {
+                        required: "El campo curso es requerido."
+                    },
+                    telefono: {
+                        required: "El campo teléfono es requerido.",
+                        digits: "El teléfono debe contener solo números.",
+                        minlength: "El teléfono debe tener exactamente 10 caracteres.",
+                        maxlength: "El teléfono debe tener exactamente 10 caracteres."
+                    }
+                },
+                submitHandler: function (form) {
+                    // Aquí puedes realizar el envío del formulario con AJAX o redireccionar
+                    form.submit();
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Inscripción a Curso</h2>
+        <p><b>Partiendo de los ejemplos introductorios a JQuery Validation para pruebas y de acuerdo al CDU dado:</b></p>
+
+        <ul>
+            <li>Coloca tu nombre y apellido.</li>
+            <li>Añade las librerías, JQuery, JQuery Validation y Bootstrap.</li>
+            <li>Diseña el formulario, recuerda usar las buenas prácticas usar ID, NAME y con valores únicos.</li>
+            <li>Realiza las validaciones.</li>
+            <li>Selecciona las excepciones y desarrollalas con el mensaje que hayas definido.</li>
+        </ul>
+
+        <form id="formInscripcion" action="/cursos/guardar" method="POST">
+            <div class="form-group">
+                <label for="curso">Curso:</label>
+                <select id="curso" name="curso" class="form-control">
+                    <option value="">Seleccione un curso</option>
+                    <option value="Curso 1">Curso 1</option>
+                    <option value="Curso 2">Curso 2</option>
+                    <option value="Curso 3">Curso 3</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="text" id="telefono" name="telefono" class="form-control" maxlength="10" />
+            </div>
+            <button type="submit" class="btn btn-primary">Solicitar inscripción</button>
+        </form>
+
+        <table class="table table-sm mt-4">
+            <thead>
+                <tr>
+                    <th colspan="2">CDU</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Nombre:</th>
+                    <td>Inscripción a Curso.</td>
+                </tr>
+                <tr>
+                    <th>Actores:</th>
+                    <td>Visitante.</td>
+                </tr>
+                <tr>
+                    <th>Disparadores:</th>
+                    <td>Ninguno.</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Flujo</th>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <p>El usuario accede a la opción "inscripción curso" y llena datos en el formulario:</p>
+                        <ul type="square">
+                            <li>Curso, requerido, de selección entre varios cursos.</li>
+                            <li>Teléfono, requerido, solo números enteros, solo 10 caracteres y de confirmación.</li>
+                        </ul>
+                        <p>Una vez lleno el formulario, da clic al botón que dice "Solicitar inscripción".</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th colspan="2">Excepciones</th>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <ul type="square">
+                            <li>Si falla en los requeridos. <b>Poner el mensaje que dirá</b>.</li>
+                            <li>Si falla en el mínimo/máximo caracteres. <b>Poner el mensaje que dirá</b>.</li>
+                            <li>Si falla en el mínimo/máximo cantidad. <b>Poner el mensaje que dirá</b>.</li>
+                            <li>Si falla en el solo números. <b>Poner el mensaje que dirá</b>.</li>
+                            <li>Si falla en el solo números enteros. <b>Poner el mensaje que dirá</b>.</li>
+                            <li>Si falla en el solo letras, alfanumérico, o en algún otro patrón. <b>Poner el mensaje que dirá</b>.</li>
+                            <li>Si falla en el control de espacios (Múltiples o sin estos). <b>Poner el mensaje que dirá</b>.</li>
+                            <li>Si falla en alguna confirmación. <b>Poner el mensaje que dirá</b>.</li>
+                            <li>Si falla en alguna otra validación. <b>Poner el mensaje que dirá</b>.</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
