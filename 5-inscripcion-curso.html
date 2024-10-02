@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Inscripción a Curso</title>
+</head>
+<body>
+    <p><b>Partiendo de los ejemplos introductorios a JQuery Validation para pruebas y de acuerdo al CDU dado:</b></p>
+    <ul>
+        <li>Coloca tu nombre y apellido.</li>
+        <li>Añade las librerías, JQuery, JQuery Validation y Bootstrap.</li>
+        <li>Diseña el formulario, recuerda usar las buenas prácticas usar ID, NAME y con valores únicos.</li>
+        <li>Realiza las validaciones.</li>
+        <li>Selecciona las excepciones y desarrollalas con el mensaje que hayas definido.</li>
+    </ul>
+    <p><b>Nombre del Alumno: </b></p>
+    <!-- table index 1 -->
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th colspan="2">
+                    CDU
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>Nombre:</th>
+                <td>Inscripción a Curso.</td>
+            </tr>
+            <tr>
+                <th>Actores:</th>
+                <td>Visitante.</td>
+            </tr>
+            <tr>
+                <th>Disparadores:</th>
+                <td>Ninguno.</td>
+            </tr>
+            <tr>
+                <th colspan="2">Flujo</th>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <p>El usuario accede a la opción "inscripción curso" y llena datos en el formulario:</p>
+                    <ul type="square">
+                        <li>Curso, requerido, de selección entre varios cursos.</li>
+                        <li>Teléfono, requerido, solo números enteros, solo 10 caracteres y de confirmación.</li>
+                    </ul>
+                    <p>Una vez lleno el formulario, da clic al botón que dice "Solicitar inscripción".</p>
+                </td>
+            </tr>
+            <tr>
+                <th colspan="2">Excepciones</th>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <ul type="square">
+                        <li>Si falla en los requeridos. <b>Poner el mensaje que dirá</b>.</li>
+                        <li>Si falla en el mínimo/máximo caracteres. <b>Poner el mensaje que dirá</b>.</li>
+                        <li>Si falla en el mínimo/máximo cantidad. <b>Poner el mensaje que dirá</b>.</li>
+                        <li>Si falla en el solo números. <b>Poner el mensaje que dirá</b>.</li>
+                        <li>Si falla en el solo números enteros. <b>Poner el mensaje que dirá</b>.</li>
+                        <li>Si falla en el solo letras, alfanumérico, o en algún otro patrón. <b>Poner el mensaje que dirá</b>.</li>
+                        <li>Si falla en el control de espacios (Multiples o sin estos). <b>Poner el mensaje que dirá</b>.</li>
+                        <li>Si falla en alguna confirmación. <b>Poner el mensaje que dirá</b>.</li>
+                        <li>Si falla en alguna otra validación. <b>Poner el mensaje que dirá</b>.</li>
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
