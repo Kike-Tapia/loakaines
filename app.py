@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, jsonify
 import mysql.connector
 import pusher
 
@@ -59,6 +59,7 @@ def usuarios_guardar():
     # Retorna un JSON indicando éxito (para AJAX)
     return jsonify({"status": "success", "usuario": usuario})
 
+# Ruta para buscar usuarios
 @app.route("/buscar")
 def buscar():
     if not con.is_connected():
@@ -86,9 +87,16 @@ def cursos_guardar():
 
     con.commit()
 
+    # Emitir evento de Pusher para notificar sobre el nuevo curso
+    pusher_client.trigger("cursos-channel", "nuevo-curso", {
+        "nombre_curso": nombre_curso,
+        "telefono": telefono
+    })
+
     # Retorna un JSON indicando éxito (para AJAX)
     return jsonify({"status": "success", "nombre_curso": nombre_curso})
 
+# Ruta para buscar cursos
 @app.route("/cursos/buscar")
 def buscar_cursos():
     if not con.is_connected():
@@ -101,4 +109,3 @@ def buscar_cursos():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
