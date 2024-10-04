@@ -29,6 +29,10 @@ def index():
 def usuarios():
     return render_template("usuarios.html")
 
+@app.route("/cursos")
+def cursos():
+    return render_template("cursos.html")
+
 # Ruta para guardar un nuevo usuario
 @app.route("/usuarios/guardar", methods=["POST"])
 def usuarios_guardar():
@@ -65,5 +69,36 @@ def buscar():
 
     return jsonify(registros)
 
+# Ruta para guardar un nuevo curso
+@app.route("/cursos/guardar", methods=["POST"])
+def cursos_guardar():
+    nombre_curso = request.form["txtNombreCurso"]
+    telefono = request.form["txtTelefono"]
+
+    if not con.is_connected():
+        con.reconnect()
+    cursor = con.cursor()
+
+    # Insertar el curso en la base de datos
+    sql = "INSERT INTO tst0_cursos (Nombre_Curso, Telefono) VALUES (%s, %s)"
+    val = (nombre_curso, telefono)
+    cursor.execute(sql, val)
+
+    con.commit()
+
+    # Retorna un JSON indicando éxito (para AJAX)
+    return jsonify({"status": "success", "nombre_curso": nombre_curso})
+
+@app.route("/cursos/buscar")
+def buscar_cursos():
+    if not con.is_connected():
+        con.reconnect()
+    cursor = con.cursor()
+    cursor.execute("SELECT * FROM tst0_cursos ORDER BY Id_Curso DESC")
+    registros = cursor.fetchall()
+
+    return jsonify(registros)
+
 if __name__ == "__main__":
     app.run(debug=True)
+
