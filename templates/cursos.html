@@ -35,7 +35,24 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
     <script>
+        // Inicializar Pusher con tus credenciales
+        var pusher = new Pusher('ffa9ea426828188c22c1', {
+            cluster: 'us2',
+            encrypted: true
+        });
+
+        // Suscribirse al canal de cursos
+        var channel = pusher.subscribe('cursos-channel');
+
+        // Escuchar el evento de "nuevo-curso"
+        channel.bind('nuevo-curso', function(data) {
+            alert("Nuevo curso añadido: " + data.nombre_curso);
+            buscarCursos(); // Actualizar la lista de cursos
+        });
+
+        // Función para cargar los cursos
         function buscarCursos() {
             $.get("/cursos/buscar", function (respuesta) {
                 $("#tbodyCursos").html(""); // Limpiar la tabla
@@ -52,9 +69,11 @@
             });
         }
 
+        // Al cargar la página, buscar los cursos
         $(document).ready(function() {
-            buscarCursos(); // Llamar al cargar la página
-            
+            buscarCursos(); // Cargar cursos al iniciar
+
+            // Guardar nuevo curso
             $('#frmCursos').submit(function (e) {
                 e.preventDefault(); // Prevenir la recarga de página
 
