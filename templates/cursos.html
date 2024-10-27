@@ -58,7 +58,8 @@
             $('#cursoForm').on('submit', function(e) {
                 e.preventDefault();
                 $.post('/cursos/guardar', $(this).serialize(), function(response) {
-                    $('#cursoForm')[0].reset();
+                    $('#cursoForm')[0].reset(); // Limpia el formulario después de guardar
+                    cargarCursos(); // Asegura la actualización inmediata
                 });
             });
         });
@@ -94,7 +95,7 @@
         function eliminarCurso(id) {
             if (confirm('¿Estás seguro de que deseas eliminar este curso?')) {
                 $.post('/cursos/eliminar', { id_curso: id }, function() {
-                    // No es necesario llamar a cargarCursos aquí, ya que Pusher lo hará
+                    cargarCursos();
                 });
             }
         }
