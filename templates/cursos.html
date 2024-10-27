@@ -38,44 +38,39 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
     <script>
-        // Inicializar Pusher con tus credenciales
-        var pusher = new Pusher('ffa9ea426828188c22c1', {
+        var pusher = new Pusher('2df86616075904231311', {
             cluster: 'us2',
             encrypted: true
         });
-
-        // Suscribirse al canal de cursos
         var channel = pusher.subscribe('cursos-channel');
 
-        // Escuchar eventos de cursos
         channel.bind('nuevo-curso', function(data) {
             alert("Nuevo curso añadido: " + data.nombre_curso);
-            buscarCursos(); // Actualizar la lista de cursos
+            buscarCursos();
         });
 
         channel.bind('curso-modificado', function(data) {
             alert("Curso modificado: " + data.nombre_curso);
-            buscarCursos(); // Actualizar la lista de cursos
+            buscarCursos();
         });
 
         channel.bind('curso-eliminado', function(data) {
             alert("Curso eliminado con ID: " + data.id);
-            buscarCursos(); // Actualizar la lista de cursos
+            buscarCursos();
         });
 
-        // Función para cargar los cursos
         function buscarCursos() {
             $.get("/cursos/buscar", function (respuesta) {
-                $("#tbodyCursos").html(""); // Limpiar la tabla
+                $("#tbodyCursos").html("");
                 for (var x in respuesta) {
                     var registro = respuesta[x];
                     $("#tbodyCursos").append(`<tr>
-                        <td>${registro[0]}</td>
-                        <td>${registro[1]}</td>
-                        <td>${registro[2]}</td>
+                        <td>${registro.Id_Curso}</td>
+                        <td>${registro.Nombre_Curso}</td>
+                        <td>${registro.Telefono}</td>
                         <td>
-                            <button class="btn btn-warning btn-sm" onclick="mostrarModificar(${registro[0]}, '${registro[1]}', '${registro[2]}')">Modificar</button>
-                            <button class="btn btn-danger btn-sm" onclick="eliminarCurso(${registro[0]})">Eliminar</button>
+                            <button class="btn btn-warning btn-sm" onclick="mostrarModificar(${registro.Id_Curso}, '${registro.Nombre_Curso}', '${registro.Telefono}')">Modificar</button>
+                            <button class="btn btn-danger btn-sm" onclick="eliminarCurso(${registro.Id_Curso})">Eliminar</button>
                         </td>
                     </tr>`);
                 }
@@ -84,34 +79,30 @@
             });
         }
 
-        // Al cargar la página, buscar los cursos
         $(document).ready(function() {
-            buscarCursos(); // Cargar cursos al iniciar
-
-            // Guardar nuevo curso o modificar existente
+            buscarCursos();
             $('#frmCursos').submit(function (e) {
-                e.preventDefault(); // Prevenir la recarga de página
-
+                e.preventDefault();
                 var datosFormulario = $(this).serialize();
                 var cursoId = $(this).data('id');
 
-                if (cursoId) { // Modificación
+                if (cursoId) {
                     datosFormulario += '&id=' + cursoId;
                     $.post("/cursos/modificar", datosFormulario, function (respuesta) {
                         if (respuesta.status === "success") {
                             alert("Curso modificado exitosamente: " + respuesta.nombre_curso);
-                            buscarCursos(); // Actualiza la tabla
+                            buscarCursos();
                         } else {
                             alert("Error al modificar el curso.");
                         }
                     }).fail(function () {
                         alert("Error en la conexión.");
                     });
-                } else { // Nuevo curso
+                } else {
                     $.post("/cursos/guardar", datosFormulario, function (respuesta) {
                         if (respuesta.status === "success") {
                             alert("Curso guardado exitosamente: " + respuesta.nombre_curso);
-                            buscarCursos(); // Actualiza la tabla
+                            buscarCursos();
                         } else {
                             alert("Error al guardar el curso.");
                         }
@@ -125,7 +116,7 @@
         function mostrarModificar(id, nombre, telefono) {
             $('#txtNombreCurso').val(nombre);
             $('#txtTelefono').val(telefono);
-            $('#frmCursos').attr('data-id', id); // Guardar el ID en el formulario
+            $('#frmCursos').attr('data-id', id);
         }
 
         function eliminarCurso(id) {
@@ -136,7 +127,7 @@
                     success: function (respuesta) {
                         if (respuesta.status === "success") {
                             alert("Curso eliminado exitosamente.");
-                            buscarCursos(); // Actualiza la tabla
+                            buscarCursos();
                         }
                     },
                     error: function () {
