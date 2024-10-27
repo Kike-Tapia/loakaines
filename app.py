@@ -6,17 +6,17 @@ app = Flask(__name__)
 
 # Configura tu conexión a la base de datos
 con = mysql.connector.connect(
-    host="localhost",
-    user="tu_usuario",
-    password="tu_contraseña",
-    database="tu_base_de_datos"
+    host="185.232.14.52",
+    user="u760464709_tst_sep_usr",
+    password="dJ0CIAFF",
+    database="u760464709_tst_sep"
 )
 
 # Configura Pusher
 pusher_client = Pusher(
-    app_id='tu_app_id',
-    key='ffa9ea426828188c22c1',
-    secret='tu_secret',
+    app_id='1714541',
+    key='2df86616075904231311',
+    secret='2f91d936fd43d8e85a1a',
     cluster='us2',
     ssl=True
 )
