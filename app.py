@@ -104,6 +104,7 @@ def eliminar_curso():
     return make_response(jsonify({}))
 
 def notificar_actualizacion_cursos():
+    # Envía una notificación a Pusher
     pusher_client.trigger('canalCursos', 'cursoActualizado', {})
 
 if __name__ == "__main__":
