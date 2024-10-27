@@ -47,6 +47,7 @@
         const channel = pusher.subscribe('canalCursos');
 
         channel.bind('cursoActualizado', function(data) {
+            console.log("Actualización recibida:", data); // Para ver si se recibe la notificación
             cargarCursos(); // Llama a cargarCursos para actualizar la tabla
         });
 
