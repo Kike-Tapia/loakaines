@@ -1,10 +1,16 @@
 from flask import Flask, render_template, request, jsonify
 import mysql.connector
 import pusher
-import datetime
-import pytz
 
 app = Flask(__name__)
+
+# Configuración de la base de datos
+DB_CONFIG = {
+    'host': "185.232.14.52",
+    'database': "u760464709_tst_sep",
+    'user': "u760464709_tst_sep_usr",
+    'password': "dJ0CIAFF="
+}
 
 # Configuración de Pusher
 pusher_client = pusher.Pusher(
@@ -17,38 +23,31 @@ pusher_client = pusher.Pusher(
 
 # Función para establecer una conexión a la base de datos
 def connect_db():
-    return mysql.connector.connect(
-        host="185.232.14.52",
-        database="u760464709_tst_sep",
-        user="u760464709_tst_sep_usr",
-        password="dJ0CIAFF=",
-        connection_timeout=10
-    )
+    return mysql.connector.connect(**DB_CONFIG)
+
+@app.route("/")
+def index():
+    return render_template("index.html")  # Cambia a tu archivo HTML principal si es necesario
 
 @app.route("/cursos")
 def cursos():
     return render_template("cursos.html")
 
-# Ruta para guardar un nuevo curso
 @app.route("/cursos/guardar", methods=["POST"])
 def cursos_guardar():
     nombre_curso = request.form["txtNombreCurso"]
     telefono = request.form["txtTelefono"]
+
     con = None
+    cursor = None
 
     try:
         con = connect_db()
         cursor = con.cursor()
 
-        # Inicia una transacción
-        con.start_transaction()
-        
-        # Ejecuta la inserción
+        # Inserta el nuevo curso
         sql = "INSERT INTO tst0_cursos (Nombre_Curso, Telefono) VALUES (%s, %s)"
-        val = (nombre_curso, telefono)
-        cursor.execute(sql, val)
-        
-        # Confirma la transacción
+        cursor.execute(sql, (nombre_curso, telefono))
         con.commit()
 
         # Notificación a Pusher
@@ -60,8 +59,6 @@ def cursos_guardar():
         return jsonify({"status": "success", "nombre_curso": nombre_curso})
 
     except mysql.connector.Error as err:
-        if con:
-            con.rollback()  # Revertir en caso de error
         return jsonify({"status": "error", "message": f"Error en la conexión: {err}"}), 500
     finally:
         if cursor:
@@ -69,13 +66,16 @@ def cursos_guardar():
         if con:
             con.close()
 
-# Ruta para buscar cursos
-@app.route("/cursos/buscar")
+@app.route("/cursos/buscar", methods=["GET"])
 def buscar_cursos():
     con = None
+    cursor = None
+
     try:
         con = connect_db()
         cursor = con.cursor(dictionary=True)
+
+        # Selecciona todos los cursos
         cursor.execute("SELECT * FROM tst0_cursos ORDER BY Id_Curso DESC")
         registros = cursor.fetchall()
         return jsonify(registros)
@@ -88,27 +88,22 @@ def buscar_cursos():
         if con:
             con.close()
 
-# Ruta para modificar un curso
 @app.route("/cursos/modificar", methods=["POST"])
 def cursos_modificar():
     curso_id = request.form["id"]
     nombre_curso = request.form["txtNombreCurso"]
     telefono = request.form["txtTelefono"]
+
     con = None
+    cursor = None
 
     try:
         con = connect_db()
         cursor = con.cursor()
 
-        # Inicia una transacción
-        con.start_transaction()
-        
-        # Ejecuta la actualización
+        # Actualiza el curso
         sql = "UPDATE tst0_cursos SET Nombre_Curso = %s, Telefono = %s WHERE Id_Curso = %s"
-        val = (nombre_curso, telefono, curso_id)
-        cursor.execute(sql, val)
-        
-        # Confirma la transacción
+        cursor.execute(sql, (nombre_curso, telefono, curso_id))
         con.commit()
 
         # Notificación a Pusher
@@ -121,8 +116,6 @@ def cursos_modificar():
         return jsonify({"status": "success", "nombre_curso": nombre_curso})
 
     except mysql.connector.Error as err:
-        if con:
-            con.rollback()  # Revertir en caso de error
         return jsonify({"status": "error", "message": f"Error en la conexión: {err}"}), 500
     finally:
         if cursor:
@@ -130,22 +123,18 @@ def cursos_modificar():
         if con:
             con.close()
 
-# Ruta para eliminar un curso
 @app.route("/cursos/eliminar/<int:id>", methods=["DELETE"])
 def cursos_eliminar(id):
     con = None
+    cursor = None
+
     try:
         con = connect_db()
         cursor = con.cursor()
 
-        # Inicia una transacción
-        con.start_transaction()
-        
-        # Ejecuta la eliminación
+        # Elimina el curso
         sql = "DELETE FROM tst0_cursos WHERE Id_Curso = %s"
         cursor.execute(sql, (id,))
-        
-        # Confirma la transacción
         con.commit()
 
         # Notificación a Pusher
@@ -154,8 +143,6 @@ def cursos_eliminar(id):
         return jsonify({"status": "success"})
 
     except mysql.connector.Error as err:
-        if con:
-            con.rollback()  # Revertir en caso de error
         return jsonify({"status": "error", "message": f"Error en la conexión: {err}"}), 500
     finally:
         if cursor:
