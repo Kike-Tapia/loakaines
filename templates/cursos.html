@@ -9,39 +9,73 @@
 <body>
     <h1>Gestión de Cursos</h1>
     <form id="cursoForm">
-        <input type="text" name="txtNombreCurso" placeholder="Nombre del Curso" required>
-        <input type="text" name="txtTelefono" placeholder="Teléfono" required>
+        <input type="hidden" name="id_curso" id="id_curso">
+        <label for="nombre_curso">Nombre del Curso:</label>
+        <input type="text" name="nombre_curso" id="nombre_curso" required>
+        <label for="telefono">Teléfono:</label>
+        <input type="text" name="telefono" id="telefono" required>
         <button type="submit">Guardar Curso</button>
     </form>
-
-    <h2>Lista de Cursos</h2>
-    <ul id="cursosList"></ul>
+    <hr>
+    <h2>Cursos Existentes</h2>
+    <table id="cursosTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre del Curso</th>
+                <th>Teléfono</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             // Cargar cursos al inicio
             cargarCursos();
 
-            // Guardar curso
-            $('#cursoForm').submit(function (e) {
+            // Guardar o editar curso
+            $('#cursoForm').on('submit', function(e) {
                 e.preventDefault();
-                $.post('/cursos/guardar', $(this).serialize(), function (data) {
-                    if (data.status === "success") {
-                        alert("Curso guardado: " + data.nombre_curso);
-                        cargarCursos();  // Actualiza la lista de cursos
-                    } else {
-                        alert("Error: " + data.message);
-                    }
+                $.post('/cursos/guardar', $(this).serialize(), function(response) {
+                    cargarCursos();
+                    $('#cursoForm')[0].reset();
                 });
             });
         });
 
         function cargarCursos() {
-            $.get('/cursos/buscar', function (data) {
-                $('#cursosList').empty();
-                data.forEach(function (curso) {
-                    $('#cursosList').append('<li>' + curso.Nombre_Curso + ' - ' + curso.Telefono + '</li>');
+            $.get('/cursos/buscar', function(data) {
+                const tbody = $('#cursosTable tbody');
+                tbody.empty();
+                data.forEach(curso => {
+                    tbody.append(`
+                        <tr>
+                            <td>${curso.Id_Curso}</td>
+                            <td>${curso.Nombre_Curso}</td>
+                            <td>${curso.Telefono}</td>
+                            <td>
+                                <button onclick="editarCurso(${curso.Id_Curso})">Editar</button>
+                                <button onclick="eliminarCurso(${curso.Id_Curso})">Eliminar</button>
+                            </td>
+                        </tr>
+                    `);
                 });
+            });
+        }
+
+        function editarCurso(id) {
+            $.get(`/cursos/editar?id_curso=${id}`, function(curso) {
+                $('#id_curso').val(curso.Id_Curso);
+                $('#nombre_curso').val(curso.Nombre_Curso);
+                $('#telefono').val(curso.Telefono);
+            });
+        }
+
+        function eliminarCurso(id) {
+            $.post('/cursos/eliminar', { id_curso: id }, function() {
+                cargarCursos();
             });
         }
     </script>
