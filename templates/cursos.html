@@ -6,7 +6,6 @@
     <title>Gestión de Cursos</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
 </head>
 <body>
     <div class="container mt-5">
@@ -40,31 +39,19 @@
     </div>
 
     <script>
-        // Configura Pusher y suscribe al canal
-        const pusher = new Pusher('2df86616075904231311', {
-            cluster: 'us2',
-            encrypted: true
-        });
-
-        const channel = pusher.subscribe('canalCursos');
-        channel.bind('cursoActualizado', function() {
-            cargarCursos();
-        });
-
         $(document).ready(function() {
             cargarCursos();
 
-            // Guardar curso
+            // Guardar o editar curso
             $('#cursoForm').on('submit', function(e) {
                 e.preventDefault();
-                $.post('/cursos/guardar', $(this).serialize(), function() {
-                    $('#cursoForm')[0].reset();
+                $.post('/cursos/guardar', $(this).serialize(), function(response) {
                     cargarCursos();
+                    $('#cursoForm')[0].reset();
                 });
             });
         });
 
-        // Cargar lista de cursos
         function cargarCursos() {
             $.get('/cursos/buscar', function(data) {
                 const tbody = $('#cursosTable tbody');
@@ -85,7 +72,6 @@
             });
         }
 
-        // Editar curso
         function editarCurso(id) {
             $.get(`/cursos/editar?id_curso=${id}`, function(curso) {
                 $('#id_curso').val(curso.Id_Curso);
@@ -94,7 +80,6 @@
             });
         }
 
-        // Eliminar curso
         function eliminarCurso(id) {
             if (confirm('¿Estás seguro de que deseas eliminar este curso?')) {
                 $.post('/cursos/eliminar', { id_curso: id }, function() {
