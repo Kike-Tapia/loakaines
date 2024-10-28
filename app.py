@@ -1,10 +1,9 @@
-from flask import Flask, render_template, request, jsonify
-import pusher
+from flask import Flask, render_template, request, jsonify, make_response
 import mysql.connector
+import datetime
+import pytz
 
-app = Flask(__name__)
-
-# Configuración de la base de datos
+# Conexión a la base de datos
 con = mysql.connector.connect(
     host="185.232.14.52",
     database="u760464709_tst_sep",
@@ -12,69 +11,89 @@ con = mysql.connector.connect(
     password="dJ0CIAFF="
 )
 
-# Configuración de Pusher
-pusher_client = pusher.Pusher(
-    app_id="1714541",
-    key="2df86616075904231311",
-    secret="2f91d936fd43d8e85a1a",
-    cluster="us2",
-    ssl=True
-)
+app = Flask(__name__)
 
 @app.route("/")
 def index():
+    return render_template("app.html")
+
+@app.route("/cursos")
+def cursos():
     return render_template("cursos.html")
 
-@app.route("/cursos/buscar")
-def buscar():
+@app.route("/cursos/guardar", methods=["POST"])
+def cursos_guardar():
+    if not con.is_connected():
+        con.reconnect()
+
+    id_curso = request.form.get("id_curso")
+    nombre_curso = request.form["nombre_curso"]
+    telefono = request.form["telefono"]
+
+    cursor = con.cursor()
+
+    if id_curso:  # Si existe un ID, actualizamos
+        sql = """
+        UPDATE tst0_cursos SET
+        Nombre_Curso = %s,
+        Telefono = %s
+        WHERE Id_Curso = %s
+        """
+        val = (nombre_curso, telefono, id_curso)
+    else:  # Si no existe, insertamos un nuevo curso
+        sql = """
+        INSERT INTO tst0_cursos (Nombre_Curso, Telefono)
+        VALUES (%s, %s)
+        """
+        val = (nombre_curso, telefono)
+
+    cursor.execute(sql, val)
+    con.commit()
+    con.close()
+
+    return make_response(jsonify({"success": True}))
+
+@app.route("/cursos/buscar", methods=["GET"])
+def cursos_buscar():
     if not con.is_connected():
         con.reconnect()
 
     cursor = con.cursor(dictionary=True)
-    cursor.execute("SELECT Id_Curso, Nombre_Curso, Telefono FROM tst0_cursos ORDER BY Id_Curso DESC")
-    registros = cursor.fetchall()
-    cursor.close()
+    cursor.execute("SELECT Id_Curso, Nombre_Curso, Telefono FROM tst0_cursos")
+    cursos = cursor.fetchall()
+    con.close()
 
-    return jsonify(registros)
+    return make_response(jsonify(cursos))
 
-@app.route("/cursos/guardar", methods=["POST"])
-def guardar():
+@app.route("/cursos/editar", methods=["GET"])
+def cursos_editar():
     if not con.is_connected():
         con.reconnect()
 
-    id_curso = request.form.get("id_curso")
-    nombre_curso = request.form.get("nombre_curso")
-    telefono = request.form.get("telefono")
-    cursor = con.cursor()
+    id_curso = request.args["id_curso"]
 
-    if id_curso:
-        cursor.execute("UPDATE tst0_cursos SET Nombre_Curso=%s, Telefono=%s WHERE Id_Curso=%s", (nombre_curso, telefono, id_curso))
-    else:
-        cursor.execute("INSERT INTO tst0_cursos (Nombre_Curso, Telefono) VALUES (%s, %s)", (nombre_curso, telefono))
+    cursor = con.cursor(dictionary=True)
+    sql = "SELECT Id_Curso, Nombre_Curso, Telefono FROM tst0_cursos WHERE Id_Curso = %s"
+    cursor.execute(sql, (id_curso,))
+    curso = cursor.fetchone()
+    con.close()
 
-    con.commit()
-    cursor.close()
-
-    # Notificación de actualización
-    pusher_client.trigger('canalCursos', 'cursoActualizado', {})
-
-    return jsonify({"status": "success"})
+    return make_response(jsonify(curso))
 
 @app.route("/cursos/eliminar", methods=["POST"])
-def eliminar():
-    id_curso = request.form.get("id_curso")
+def cursos_eliminar():
     if not con.is_connected():
         con.reconnect()
 
+    id_curso = request.form["id_curso"]
+
     cursor = con.cursor()
-    cursor.execute("DELETE FROM tst0_cursos WHERE Id_Curso = %s", (id_curso,))
+    sql = "DELETE FROM tst0_cursos WHERE Id_Curso = %s"
+    cursor.execute(sql, (id_curso,))
     con.commit()
-    cursor.close()
+    con.close()
 
-    # Notificación de eliminación
-    pusher_client.trigger('canalCursos', 'cursoActualizado', {})
-
-    return jsonify({"status": "success"})
+    return make_response(jsonify({"success": True}))
 
 if __name__ == "__main__":
     app.run(debug=True)
