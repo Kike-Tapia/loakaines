@@ -46,8 +46,9 @@
         });
         const channel = pusher.subscribe('canalCursos');
 
+        // Escuchar el evento cursoActualizado y recargar cursos
         channel.bind('cursoActualizado', function(data) {
-            console.log("Actualización recibida:", data); // Para ver si se recibe la notificación
+            console.log("Evento recibido en Pusher:", data); // Verifica si el evento se recibe
             cargarCursos(); // Llama a cargarCursos para actualizar la tabla
         });
 
@@ -95,7 +96,7 @@
         function eliminarCurso(id) {
             if (confirm('¿Estás seguro de que deseas eliminar este curso?')) {
                 $.post('/cursos/eliminar', { id_curso: id }, function() {
-                    cargarCursos();
+                    cargarCursos(); // Asegura la actualización inmediata
                 });
             }
         }
