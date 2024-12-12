@@ -22,22 +22,7 @@ def cursosBuscar():
 
     return make_response(jsonify(cursos))
 
-app = Flask(__name__)
-
-@app.route("/")
-def index():
-    return render_template("app.html")
-
-@app.route("/cursos")
-def cursos():
-    return render_template("cursos.html")
-
-@app.route("/cursos/guardar", methods=["POST"])
-def cursos_guardar():
-    id_curso = request.form.get("id_curso")
-    nombre_curso = request.form["nombre_curso"]
-    telefono = request.form["telefono"]
-
+def cursosGuardar(id_curso, nombre_curso, telefono):
     con = mysql.connector.connect(
         host="185.232.14.52",
         database="u760464709_tst_sep",
@@ -70,6 +55,24 @@ def cursos_guardar():
     con.close()
 
     return make_response(jsonify({"success": True}))
+
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+    return render_template("app.html")
+
+@app.route("/cursos")
+def cursos():
+    return render_template("cursos.html")
+
+@app.route("/cursos/guardar", methods=["POST"])
+def cursos_guardar():
+    id_curso = request.form.get("id_curso")
+    nombre_curso = request.form["nombre_curso"]
+    telefono = request.form["telefono"]
+
+    return cursosGuardar(id_curso,nombre_curso, telefono)
 
 @app.route("/cursos/buscar", methods=["GET"])
 def cursos_buscar():
