@@ -3,13 +3,24 @@ import mysql.connector
 import datetime
 import pytz
 
-# Conexión a la base de datos
-con = mysql.connector.connect(
-    host="185.232.14.52",
-    database="u760464709_tst_sep",
-    user="u760464709_tst_sep_usr",
-    password="dJ0CIAFF="
-)
+def cursosBuscar():
+    # Conexión a la base de datos
+    con = mysql.connector.connect(
+        host="185.232.14.52",
+        database="u760464709_tst_sep",
+        user="u760464709_tst_sep_usr",
+        password="dJ0CIAFF="
+    )
+
+    # if not con.is_connected():
+        # con.reconnect()
+
+    cursor = con.cursor(dictionary=True)
+    cursor.execute("SELECT Id_Curso, Nombre_Curso, Telefono FROM tst0_cursos")
+    cursos = cursor.fetchall()
+    con.close()
+
+    return make_response(jsonify(cursos))
 
 app = Flask(__name__)
 
@@ -23,8 +34,8 @@ def cursos():
 
 @app.route("/cursos/guardar", methods=["POST"])
 def cursos_guardar():
-    if not con.is_connected():
-        con.reconnect()
+    # if not con.is_connected():
+        # con.reconnect()
 
     id_curso = request.form.get("id_curso")
     nombre_curso = request.form["nombre_curso"]
@@ -55,15 +66,7 @@ def cursos_guardar():
 
 @app.route("/cursos/buscar", methods=["GET"])
 def cursos_buscar():
-    if not con.is_connected():
-        con.reconnect()
-
-    cursor = con.cursor(dictionary=True)
-    cursor.execute("SELECT Id_Curso, Nombre_Curso, Telefono FROM tst0_cursos")
-    cursos = cursor.fetchall()
-    con.close()
-
-    return make_response(jsonify(cursos))
+    return make_response(jsonify(cursosBuscar()))
 
 @app.route("/cursos/editar", methods=["GET"])
 def cursos_editar():
