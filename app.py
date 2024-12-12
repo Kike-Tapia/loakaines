@@ -73,7 +73,7 @@ def cursos_guardar():
 
 @app.route("/cursos/buscar", methods=["GET"])
 def cursos_buscar():
-    return make_response(jsonify(cursosBuscar()))
+    return cursosBuscar()
 
 @app.route("/cursos/editar", methods=["GET"])
 def cursos_editar():
