@@ -34,12 +34,19 @@ def cursos():
 
 @app.route("/cursos/guardar", methods=["POST"])
 def cursos_guardar():
-    # if not con.is_connected():
-        # con.reconnect()
-
     id_curso = request.form.get("id_curso")
     nombre_curso = request.form["nombre_curso"]
     telefono = request.form["telefono"]
+
+    con = mysql.connector.connect(
+        host="185.232.14.52",
+        database="u760464709_tst_sep",
+        user="u760464709_tst_sep_usr",
+        password="dJ0CIAFF="
+    )
+
+    # if not con.is_connected():
+        # con.reconnect()
 
     cursor = con.cursor()
 
